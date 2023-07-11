@@ -1,8 +1,8 @@
 import asyncio  # Работа с асинхронностью
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command  # Фильтр для /start, /...
-from aiogram.types import Message  # Тип сообщения
+from aiogram.types import Message, ContentType  # Тип сообщения
 
 from config import config  # Config
 
@@ -14,7 +14,7 @@ dp: Dispatcher = Dispatcher()  # Менеджер бота
 
 @dp.message(Command(commands=['start']))  # Берём только сообщения, являющиеся командой /start
 async def start_command(message: Message):
-    await message.answer("Привет!")
+    await message.answer("Привет!, я копирующий тебя бот")
 
 @dp.message (Command(commands=['help']))
 async def help_command(message: Message):
@@ -24,10 +24,27 @@ async def question_command(message: Message):
     await message.answer('Всё отлично!')
 @dp.message (Command(commands=['Сколько_раз_можешь_подтянуться?']))
 async def question_command(message: Message):
-    await message.answer('Пока рекорд 9 раз:(')
-@dp.message ()
-async def echo(message: Message):
+     await message.answer('Пока рекорд 9 раз:(')
+# @dp.message ()
+# async def echo(message: Message):
+#     await message.answer(message.text)
+@dp.message(F.content_type == ContentType.PHOTO)
+async def echo_photo(message:Message):
+    await message.answer_photo(message.photo[0].file_id)
+
+@dp.message(F.content_type == ContentType.TEXT)
+async def echo(message:Message):
     await message.answer(message.text)
+# @dp.message(F.content_type == ContentType.STICKER)
+# async def echo_sticker(message:Message):
+#     await message.answer_sticker(message.sticker[0].file_id)
+# @dp.message(F.content_type == ContentType.VOICE)
+# async def echo_voice(message:Message):
+#     await message.answer_voice(message.text[0].file_id)
+    
+@dp.message()
+async def echo_all(message: Message):
+    await message.send_copy(message.chat.id)
 async def main():
     try:
         print('Bot Started')
